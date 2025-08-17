@@ -22,22 +22,16 @@
 </div>
 
 <script>
-    // https://tetris.fandom.com/wiki/Tetris_Guideline
-
-    // get a random integer between the range of [min,max]
-    // @see https://stackoverflow.com/a/1527820/2124254
+    // [min, max] 범위의 무작위 정수 얻기
     function getRandomInt(min, max) {
         min = Math.ceil(min);
         max = Math.floor(max);
-
         return Math.floor(Math.random() * (max - min + 1)) + min;
     }
 
-    // generate a new tetromino sequence
-    // @see https://tetris.fandom.com/wiki/Random_Generator
+    // 새로운 도형 생성
     function generateSequence() {
         const sequence = ['I', 'J', 'L', 'O', 'S', 'T', 'Z'];
-
         while (sequence.length) {
             const rand = getRandomInt(0, sequence.length - 1);
             const name = sequence.splice(rand, 1)[0];
@@ -45,50 +39,44 @@
         }
     }
 
-    // get the next tetromino in the sequence
+    // 다음 도형 가져오기
     function getNextTetromino() {
         if (tetrominoSequence.length === 0) {
             generateSequence();
         }
-
         const name = tetrominoSequence.pop();
         const matrix = tetrominos[name];
-
-        // I and O start centered, all others start in left-middle
+        
         const col = playfield[0].length / 2 - Math.ceil(matrix[0].length / 2);
-
-        // I starts on row 21 (-1), all others start on row 22 (-2)
         const row = name === 'I' ? -1 : -2;
 
         return {
-            name: name,      // name of the piece (L, O, etc.)
-            matrix: matrix,  // the current rotation matrix
-            row: row,        // current row (starts offscreen)
-            col: col         // current col
+            name: name,
+            matrix: matrix,
+            row: row,
+            col: col
         };
     }
 
-    // rotate an NxN matrix 90deg
-    // @see https://codereview.stackexchange.com/a/186834
+    // N x N 행렬을 90도 회전
     function rotate(matrix) {
         const N = matrix.length - 1;
         const result = matrix.map((row, i) =>
             row.map((val, j) => matrix[N - j][i])
         );
-
         return result;
     }
 
-    // check to see if the new matrix/row/col is valid
+    // 새로운 위치와 매트릭스가 유효한지 확인
     function isValidMove(matrix, cellRow, cellCol) {
         for (let row = 0; row < matrix.length; row++) {
             for (let col = 0; col < matrix[row].length; col++) {
                 if (matrix[row][col] && (
-                    // outside the game bounds
+                    // 게임 경계를 벗어나는 경우
                     cellCol + col < 0 ||
                     cellCol + col >= playfield[0].length ||
                     cellRow + row >= playfield.length ||
-                    // collides with another piece
+                    // 다른 조각과 충돌하는 경우
                     playfield[cellRow + row][cellCol + col])
                 ) {
                     return false;
@@ -98,12 +86,12 @@
         return true;
     }
 
-    // place the tetromino on the playfield
+    // 도형을 게임 판에 고정
     function placeTetromino() {
         for (let row = 0; row < tetromino.matrix.length; row++) {
             for (let col = 0; col < tetromino.matrix[row].length; col++) {
                 if (tetromino.matrix[row][col]) {
-                    // game over if piece has any part offscreen
+                    // 조각이 화면 밖으로 나가면 게임 오버
                     if (tetromino.row + row < 0) {
                         return showGameOver();
                     }
@@ -112,11 +100,11 @@
             }
         }
 
-        // check for line clears starting from the bottom and working our way up
+        // 바닥부터 시작하여 라인 삭제 확인
         let linesCleared = 0;
         for (let row = playfield.length - 1; row >= 0; ) {
             if (playfield[row].every(cell => !!cell)) {
-                // drop every row above this one
+                // 해당 라인 위쪽의 모든 라인을 아래로 내림
                 for (let r = row; r >= 0; r--) {
                     for (let c = 0; c < playfield[r].length; c++) {
                         playfield[r][c] = playfield[r-1][c];
@@ -128,7 +116,7 @@
             }
         }
 
-        // Add score based on lines cleared
+        // 삭제된 라인 수에 따라 점수 추가
         if (linesCleared > 0) {
             let points = 0;
             switch(linesCleared) {
@@ -145,23 +133,23 @@
         isLocked = false;
     }
 
-    // update score display
+    // 점수 표시 업데이트
     function updateScore() {
         scoreElement.innerText = score;
     }
 
-    // show the game over screen
+    // 게임 오버 화면 표시
     function showGameOver() {
         cancelAnimationFrame(rAF);
         gameOver = true;
 
-        // Check and update highest score
+        // 최고 점수 확인 및 업데이트
         const currentHighest = localStorage.getItem('highestScore') || 0;
         if (score > currentHighest) {
             localStorage.setItem('highestScore', score);
         }
 
-        // Display game over screen with scores
+        // 게임 오버 화면에 점수 표시
         document.getElementById('final-score').innerText = score;
         document.getElementById('highest-score').innerText = localStorage.getItem('highestScore') || 0;
         document.getElementById('game-over-screen').style.display = 'block';
@@ -173,22 +161,19 @@
     const grid = 32;
     const tetrominoSequence = [];
     let score = 0;
-
-    // keep track of what is in every cell of the game using a 2d array
-    // tetris playfield is 10x20, with a few rows offscreen
+    
+    // 게임 판의 각 셀 상태를 추적하기 위한 2D 배열
     const playfield = [];
 
-    // populate the empty state
+    // 빈 게임 판 초기화
     for (let row = -2; row < 20; row++) {
         playfield[row] = [];
-
         for (let col = 0; col < 10; col++) {
             playfield[row][col] = 0;
         }
     }
 
-    // how to draw each tetromino
-    // @see https://tetris.fandom.com/wiki/SRS
+    // 각 도형의 모양 정의
     const tetrominos = {
         'I': [
             [0, 0, 0, 0],
@@ -227,7 +212,7 @@
         ]
     };
 
-    // color of each tetromino
+    // 각 테트로미노의 색상 정의
     const colors = {
         'I': 'cyan',
         'O': 'yellow',
@@ -240,14 +225,14 @@
 
     let count = 0;
     let tetromino = getNextTetromino();
-    let rAF = null;  // keep track of the animation frame so we can cancel it
+    let rAF = null;
     let gameOver = false;
 
     let lastDropTime = 0;
-    const lockDelay = 500; // 500ms
+    const lockDelay = 500;
     let isLocked = false;
 
-    // game loop
+    // 게임 루프
     function loop() {
         if (gameOver) {
             return;
@@ -256,52 +241,47 @@
         rAF = requestAnimationFrame(loop);
         context.clearRect(0, 0, canvas.width, canvas.height);
 
-        // draw the playfield
+        // 게임 판 그리기
         for (let row = 0; row < 20; row++) {
             for (let col = 0; col < 10; col++) {
                 if (playfield[row][col]) {
                     const name = playfield[row][col];
                     context.fillStyle = colors[name];
-
-                    // drawing 1 px smaller than the grid creates a grid effect
                     context.fillRect(col * grid, row * grid, grid - 1, grid - 1);
                 }
             }
         }
 
-        // draw the active tetromino
+        // 현재 도형 그리기
         if (tetromino) {
-            // tetromino falls every 35 frames
-            if (++count > 35) {
+            // 30프레임마다 도형 한 칸씩 떨어뜨리기
+            if (++count > 30) {
                 tetromino.row++;
                 count = 0;
 
-                // Check for collision
+                // 충돌 확인
                 if (!isValidMove(tetromino.matrix, tetromino.row, tetromino.col)) {
                     tetromino.row--;
-
-                    // Start lock delay timer if not already started
+                    // 딜레이가 시작되지 않았으면 타이머 시작
                     if (!isLocked) {
                         lastDropTime = Date.now();
                         isLocked = true;
                     }
                 } else {
-                    // Reset lock delay if the piece moves after falling
+                    // 조각이 움직이면 딜레이 초기화
                     isLocked = false;
                 }
             }
 
-            // Check if lock delay has passed
+            // 딜레이 시간이 지나면 조각 고정
             if (isLocked && Date.now() - lastDropTime > lockDelay) {
                 placeTetromino();
             }
 
             context.fillStyle = colors[tetromino.name];
-
             for (let row = 0; row < tetromino.matrix.length; row++) {
                 for (let col = 0; col < tetromino.matrix[row].length; col++) {
                     if (tetromino.matrix[row][col]) {
-                        // drawing 1 px smaller than the grid creates a grid effect
                         context.fillRect((tetromino.col + col) * grid, (tetromino.row + row) * grid, grid - 1, grid - 1);
                     }
                 }
@@ -309,34 +289,34 @@
         }
     }
 
-    // listen to keyboard events to move the active tetromino
+    // 키보드 이벤트 리스너
     document.addEventListener('keydown', function (e) {
         if (gameOver) return;
 
-        // left and right arrow keys (move)
+        // 왼쪽/오른쪽 화살표 (이동)
         if (e.which === 37 || e.which === 39) {
             const col = e.which === 37 ? tetromino.col - 1 : tetromino.col + 1;
             if (isValidMove(tetromino.matrix, tetromino.row, col)) {
                 tetromino.col = col;
-                isLocked = false; // Reset lock delay
+                isLocked = false;
             }
         }
 
-        // up arrow key (rotate)
+        // 위쪽 화살표 (회전)
         if (e.which === 38) {
             const matrix = rotate(tetromino.matrix);
             if (isValidMove(matrix, tetromino.row, tetromino.col)) {
                 tetromino.matrix = matrix;
-                isLocked = false; // Reset lock delay
+                isLocked = false;
             }
         }
 
-        // down arrow key (drop)
+        // 아래쪽 화살표 (하강)
         if (e.which === 40) {
             const row = tetromino.row + 1;
             if (!isValidMove(tetromino.matrix, row, tetromino.col)) {
                 tetromino.row = row - 1;
-                // If it can't move down, a manual drop forces placement
+                // 수동 하강 시 바로 고정
                 if (!isLocked) {
                     placeTetromino();
                 }
@@ -346,7 +326,7 @@
         }
     });
 
-    // start the game
+    // 게임 시작
     rAF = requestAnimationFrame(loop);
 </script>
 </body>
