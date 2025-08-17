@@ -109,7 +109,7 @@ function showGameOver() {
     
     cancelAnimationFrame(rAF);
     gameOver = true;
-    isPaused = true; // 게임 오버 시에도 일시 정지 상태로 설정
+    isPaused = true;
 
     const currentHighest = localStorage.getItem('highestScore') || 0;
     if (score > currentHighest) {
@@ -135,8 +135,19 @@ const flashDuration = 100;
 const totalFlashes = 3;
 
 const bgm = document.getElementById('bgm');
-bgm.volume = 0.01; // 초기 볼륨 설정
-bgm.loop = true; // BGM 반복 재생
+bgm.volume = 0.01;
+bgm.loop = true;
+
+bgm.addEventListener('ended', () => {
+    const options = Array.from(bgmSelect.options);
+    const currentIndex = options.findIndex(opt => opt.value === bgmSelect.value);
+    
+    const nextIndex = (currentIndex + 1) % options.length;
+    
+    bgmSelect.value = options[nextIndex].value;
+    bgm.src = `BGM/${bgmSelect.value}`;
+    bgm.play().catch(e => console.error("Auto play next BGM failed:", e));
+});
 
 const settingsButton = document.getElementById('settings-button');
 const settingsOverlay = document.getElementById('settings-overlay');
@@ -146,6 +157,8 @@ const bgmSelect = document.getElementById('bgm-select');
 const volumeNumber = document.getElementById('volume-number');
 
 let isPaused = false;
+let isGameStarted = true; // ⭐ 변경: 게임 시작 시 초기 상태
+const restartButton = document.getElementById('restart-button');
 
 function updateVolume(value) {
     let volume = parseFloat(value);
@@ -175,13 +188,45 @@ settingsButton.addEventListener('click', () => {
 settingsCloseButton.addEventListener('click', () => {
     isPaused = false;
     settingsOverlay.style.display = 'none';
-    bgm.play();
+    
+    if (isGameStarted) {
+        bgm.play().catch(err => console.error("BGM play failed after settings close:", err));
+    }
+    
     rAF = requestAnimationFrame(loop);
 });
 
 bgmSelect.addEventListener('change', (e) => {
     bgm.src = `BGM/${e.target.value}`;
-    bgm.play().catch(err => console.error("BGM change failed:", err));
+    
+    bgm.load();
+    if (isGameStarted && !isPaused) {
+        bgm.play().catch(err => console.error("BGM change and play failed:", err));
+    }
+});
+
+function init() {
+    score = 0;
+    isGameStarted = true;
+    gameOver = false;
+    isPaused = false;
+    tetrominoSequence.length = 0;
+    playfield.forEach(row => row.fill(0));
+    
+    tetromino = getNextTetromino();
+    
+    updateScore();
+    drawNextTetrominoes();
+
+    bgm.play().catch(e => {
+        console.error("Autoplay failed:", e);
+    });
+    rAF = requestAnimationFrame(loop);
+}
+
+restartButton.addEventListener('click', () => {
+    document.getElementById('game-over-screen').style.display = 'none';
+    init();
 });
 
 const playfield = [];
@@ -306,7 +351,7 @@ function drawNextTetrominoes() {
 }
 
 let count = 0;
-let tetromino = getNextTetromino();
+let tetromino = null;
 let rAF = null;
 let gameOver = false;
 
@@ -318,6 +363,8 @@ function loop() {
     if (gameOver || isPaused) {
         return;
     }
+
+    rAF = requestAnimationFrame(loop);
 
     if (isAnimating) {
         const elapsed = Date.now() - flashTimer;
@@ -370,11 +417,9 @@ function loop() {
                 }
             }
         }
-        rAF = requestAnimationFrame(loop);
         return;
     }
     
-    rAF = requestAnimationFrame(loop);
     context.clearRect(0, 0, canvas.width, canvas.height);
 
     for (let row = 0; row < 20; row++) {
@@ -418,9 +463,8 @@ function loop() {
     }
 }
 
-// 키 입력 이벤트 리스너 수정
 document.addEventListener('keydown', function (e) {
-    if (gameOver || isAnimating || isPaused) return;
+    if (!isGameStarted || gameOver || isAnimating || isPaused) return;
 
     if (e.which === 37 || e.which === 39) {
         const col = e.which === 37 ? tetromino.col - 1 : tetromino.col + 1;
@@ -466,9 +510,5 @@ document.addEventListener('keydown', function (e) {
     }
 });
 
-bgm.play().catch(e => {
-    console.error("Autoplay failed:", e);
-});
-
-rAF = requestAnimationFrame(loop);
-drawNextTetrominoes();
+// 시작 시 게임 초기화
+init();

@@ -9,6 +9,7 @@
     <div class="game-info">
         점수: <span id="score">0</span>
     </div>
+
     <div class="game-container">
         <canvas width="320" height="640" id="game"></canvas>
         <div class="next-piece-container">
@@ -19,9 +20,9 @@
         </div>
     </div>
 
-    <div id="game-over-screen" style="display: none;">
+    <div id="game-over-screen" class="overlay" style="display: none;">
         <h2>ㅈ밥 컷!</h2>
-        <p>점수: <span id="final-score">0</span></p>
+        <p>최종 점수: <span id="final-score">0</span></p>
         <p>최고 점수: <span id="highest-score">0</span></p>
         <div class="button-container">
            <button class="game-over-button" onclick="window.location.reload()">Restart</button>
@@ -38,8 +39,8 @@
              <label for="bgm-select">배경음악:</label>
              <select id="bgm-select">
                   <option value="BGM/BGM.mp3">테토리스 한국어</option>
-                  <option value="BGM2.mp3">테토리스 일본어</option>
-                  <option value="BGM3.mp3">BGM 3</option>
+                  <option value="BGM/BGM2.mp3">테토리스 일본어</option>
+                  <option value="BGM/BGM3.mp3">포테토칩</option>
              </select>
            </div>
            <div class="setting-item">
