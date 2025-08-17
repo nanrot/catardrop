@@ -104,6 +104,9 @@ function updateScore() {
 
 // 게임 오버 화면 표시
 function showGameOver() {
+    bgm.pause();
+    bgm.currentTime = 0;
+    
     cancelAnimationFrame(rAF);
     gameOver = true;
 
@@ -129,6 +132,32 @@ let linesToClear = [];
 let flashTimer = 0;
 const flashDuration = 100;
 const totalFlashes = 3;
+
+const bgm = document.getElementById('bgm');
+
+const settingsButton = document.getElementById('settings-button');
+const settingsOverlay = document.getElementById('settings-overlay');
+const settingsCloseButton = document.getElementById('settings-close-button');
+const volumeSlider = document.getElementById('volume-slider');
+const bgmSelect = document.getElementById('bgm-select');
+
+settingsButton.addEventListener('click', () => {
+    settingsOverlay.style.display = 'flex';
+});
+
+settingsCloseButton.addEventListener('click', () => {
+    settingsOverlay.style.display = 'none';
+});
+
+volumeSlider.addEventListener('input', (e) => {
+    bgm.volume = e.target.value;
+});
+
+bgmSelect.addEventListener('change', (e) => {
+    bgm.src = `BGM/${e.target.value}`;
+    bgm.play().catch(err => console.error("BGM change failed:", err));
+});
+
 
 const playfield = [];
 for (let row = -2; row < 20; row++) {
@@ -409,6 +438,10 @@ document.addEventListener('keydown', function (e) {
         }
         placeTetromino();
     }
+});
+
+bgm.play().catch(e => {
+    console.error("Autoplay failed:", e);
 });
 
 rAF = requestAnimationFrame(loop);

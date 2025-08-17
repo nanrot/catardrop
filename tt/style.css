@@ -93,3 +93,109 @@ canvas {
 .game-over-button:hover {
     background-color: #45a049;
 }
+
+#settings-button {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    font-size: 30px;
+    cursor: pointer;
+    color: #fff;
+    border: none;
+    background: transparent;
+    z-index: 900;
+    transition: transform 0.2s ease-in-out;
+}
+
+#settings-button:hover {
+    transform: rotate(45deg);
+}
+
+#settings-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.settings-panel {
+    background: #333;
+    padding: 30px;
+    border-radius: 10px;
+    border: 2px solid #fff;
+    box-shadow: 0 0 20px rgba(255, 255, 255, 0.1);
+    width: 300px;
+    text-align: center;
+    color: #fff;
+}
+
+.settings-panel h3 {
+    font-size: 1.5em;
+    margin-top: 0;
+    margin-bottom: 20px;
+}
+
+.setting-item {
+    margin-bottom: 20px;
+}
+
+.setting-item label {
+    display: block;
+    margin-bottom: 5px;
+    font-size: 1em;
+}
+
+.settings-panel select, .settings-panel input[type="range"] {
+    width: 100%;
+    padding: 8px;
+    box-sizing: border-box;
+    font-size: 0.8em;
+    border-radius: 5px;
+    border: none;
+}
+
+.settings-panel input[type="range"] {
+    -webkit-appearance: none;
+    height: 8px;
+    background: #555;
+    outline: none;
+    opacity: 0.7;
+    transition: opacity 0.2s;
+}
+
+.settings-panel input[type="range"]:hover {
+    opacity: 1;
+}
+
+.settings-panel input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: #fff;
+    cursor: pointer;
+}
+
+.settings-panel button {
+    background-color: #4CAF50;
+    border: none;
+    color: white;
+    padding: 10px 20px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    cursor: pointer;
+    border-radius: 8px;
+    transition-duration: 0.4s;
+}
+
+.settings-panel button:hover {
+    background-color: #45a049;
+}
