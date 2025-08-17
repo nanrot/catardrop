@@ -9,6 +9,20 @@
     <div class="game-info">
         점수: <span id="score">0</span>
     </div>
+    
+    <div id="start-screen" class="overlay">
+        <h1>테트리스</h1>
+        <div class="controls">
+            <p><strong>조작법</strong></p>
+            <p>◀ ▶: 이동</p>
+            <p>▲(Z): 시계 방향 회전</p>
+            <p>X: 반시계 방향 회전</p>
+            <p>▼: 아래로 한 칸</p>
+            <p>Space: 바닥으로 즉시 낙하</p>
+        </div>
+        <button id="start-button" class="btn">시작</button>
+    </div>
+
     <div class="game-container">
         <canvas width="320" height="640" id="game"></canvas>
         <div class="next-piece-container">
@@ -38,8 +52,8 @@
              <label for="bgm-select">배경음악:</label>
              <select id="bgm-select">
                   <option value="BGM/BGM.mp3">테토리스 한국어</option>
-                  <option value="BGM2.mp3">테토리스 일본어</option>
-                  <option value="BGM3.mp3">BGM 3</option>
+                  <option value="BGM/BGM2.mp3">테토리스 일본어</option>
+                  <option value="BGM/BGM3.mp3">포테토칩</option>
              </select>
            </div>
            <div class="setting-item">
