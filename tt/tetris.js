@@ -124,6 +124,8 @@ function showGameOver() {
 const canvas = document.getElementById('game');
 const context = canvas.getContext('2d');
 const scoreElement = document.getElementById('score');
+const startScreen = document.getElementById('start-screen');
+const startButton = document.getElementById('start-button');
 const grid = 32;
 const tetrominoSequence = [];
 let score = 0;
@@ -138,6 +140,7 @@ const bgm = document.getElementById('bgm');
 bgm.volume = 0.01;
 bgm.loop = true;
 
+// bgm 로드가 완료되면 자동으로 다음 곡을 재생하는 로직 추가
 bgm.addEventListener('ended', () => {
     const options = Array.from(bgmSelect.options);
     const currentIndex = options.findIndex(opt => opt.value === bgmSelect.value);
@@ -157,8 +160,7 @@ const bgmSelect = document.getElementById('bgm-select');
 const volumeNumber = document.getElementById('volume-number');
 
 let isPaused = false;
-let isGameStarted = true; // ⭐ 변경: 게임 시작 시 초기 상태
-const restartButton = document.getElementById('restart-button');
+let isGameStarted = false;
 
 function updateVolume(value) {
     let volume = parseFloat(value);
@@ -188,6 +190,7 @@ settingsButton.addEventListener('click', () => {
 settingsCloseButton.addEventListener('click', () => {
     isPaused = false;
     settingsOverlay.style.display = 'none';
+    bgm.play();
     
     if (isGameStarted) {
         bgm.play().catch(err => console.error("BGM play failed after settings close:", err));
@@ -198,6 +201,7 @@ settingsCloseButton.addEventListener('click', () => {
 
 bgmSelect.addEventListener('change', (e) => {
     bgm.src = `BGM/${e.target.value}`;
+    bgm.play().catch(err => console.error("BGM change failed:", err));
     
     bgm.load();
     if (isGameStarted && !isPaused) {
@@ -228,6 +232,32 @@ restartButton.addEventListener('click', () => {
     document.getElementById('game-over-screen').style.display = 'none';
     init();
 });
+
+function init() {
+    score = 0;
+    isGameStarted = true;
+    gameOver = false;
+    isPaused = false;
+    tetrominoSequence.length = 0;
+    playfield.forEach(row => row.fill(0));
+    
+    tetromino = getNextTetromino();
+    
+    startScreen.style.display = 'none';
+    
+    updateScore();
+    drawNextTetrominoes();
+
+    bgm.play().catch(e => {
+        console.error("Autoplay failed:", e);
+    });
+    rAF = requestAnimationFrame(loop);
+}
+
+startButton.addEventListener('click', () => {
+    init();
+});
+
 
 const playfield = [];
 for (let row = -2; row < 20; row++) {
@@ -351,7 +381,7 @@ function drawNextTetrominoes() {
 }
 
 let count = 0;
-let tetromino = null;
+let tetromino = null; // 초기화 함수에서 설정
 let rAF = null;
 let gameOver = false;
 
