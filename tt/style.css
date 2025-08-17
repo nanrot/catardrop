@@ -1,40 +1,74 @@
-/* style.css */
-
-/* Basic page styles */
-html, body {
-    height: 100%;
-    margin: 0;
-    font-family: monospace;
-    color: white;
-    background: black;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
+body {
+    background: #202028;
+    color: #fff;
+    font-family: sans-serif;
+    font-size: 2em;
+    text-align: center;
 }
 
-/* Game canvas and info display */
 canvas {
-    border: 1px solid white;
+    border: solid .2em #fff;
+    height: 90vh;
 }
 
 .game-info {
-    margin-bottom: 10px;
-    font-size: 20px;
+    margin-bottom: 20px;
+    font-size: 1.5em;
+    text-align: left;
 }
 
-/* Game over screen styles */
-#game-over-screen {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    background: rgba(0, 0, 0, 0.75);
-    padding: 20px;
-    border-radius: 10px;
-    text-align: center;
+.game-container {
+    display: flex;
+    gap: 20px;
+    justify-content: center;
+    align-items: flex-start;
+}
+
+.next-piece-container {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 32px;
+}
+
+.next-piece-container canvas {
+    border: 1px solid white;
+    box-sizing: border-box;
+    width: 128px;
+    height: 128px;
+}
+
+.next-title {
     color: white;
-    z-index: 10;
+    margin: 0;
+    padding: 0;
+    text-align: center;
+}
+
+/* 게임 오버 화면 스타일 */
+#game-over-screen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.8);
+    color: white;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+#game-over-screen h2 {
+    font-size: 3em;
+    margin-bottom: 10px;
+}
+
+#game-over-screen p {
+    font-size: 1.2em;
+    margin: 5px 0;
 }
 
 .button-container {
@@ -42,15 +76,20 @@ canvas {
 }
 
 .game-over-button {
-    background-color: #4CAF50; /* Green */
+    background-color: #4CAF50;
     border: none;
     color: white;
-    padding: 10px 20px;
+    padding: 15px 32px;
     text-align: center;
     text-decoration: none;
     display: inline-block;
     font-size: 16px;
     margin: 4px 2px;
     cursor: pointer;
-    border-radius: 5px;
+    border-radius: 8px;
+    transition-duration: 0.4s;
+}
+
+.game-over-button:hover {
+    background-color: #45a049;
 }
