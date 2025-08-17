@@ -7,7 +7,7 @@ function getRandomInt(min, max) {
 
 // 새로운 도형 시퀀스 생성
 function generateSequence() {
-    const sequence = ['I', 'J', 'L', 'O', 'S', 'T', 'Z'];
+    const sequence = ['I', 'J', 'L', 'O', 'S', 'T', 'Z', 'W'];
     while (sequence.length) {
         const rand = getRandomInt(0, sequence.length - 1);
         const name = sequence.splice(rand, 1)[0];
@@ -17,14 +17,12 @@ function generateSequence() {
 
 // 시퀀스에서 다음 도형 가져오기
 function getNextTetromino() {
-    // 미리보기 블록까지 포함해서 최소 4개 유지
     while (tetrominoSequence.length < 4) {
         generateSequence();
     }
     const name = tetrominoSequence.pop();
     const matrix = tetrominos[name];
     
-    // 도형의 시작 위치 계산
     const col = playfield[0].length / 2 - Math.ceil(matrix[0].length / 2);
     const row = name === 'I' ? -1 : -2;
 
@@ -36,7 +34,7 @@ function getNextTetromino() {
     };
 }
 
-// N x N 행렬을 90도 회전
+// N x N 행렬을 90도 시계 방향으로 회전
 function rotate(matrix) {
     const N = matrix.length - 1;
     const result = matrix.map((row, i) =>
@@ -45,16 +43,21 @@ function rotate(matrix) {
     return result;
 }
 
+// N x N 행렬을 90도 반시계 방향으로 회전
+function rotateCounterClockwise(matrix) {
+    const rotated1 = rotate(matrix);
+    const rotated2 = rotate(rotated1);
+    return rotate(rotated2);
+}
+
 // 새로운 위치와 매트릭스가 유효한지 확인
 function isValidMove(matrix, cellRow, cellCol) {
     for (let row = 0; row < matrix.length; row++) {
         for (let col = 0; col < matrix[row].length; col++) {
             if (matrix[row][col] && (
-                // 게임 경계를 벗어나는 경우
                 cellCol + col < 0 ||
                 cellCol + col >= playfield[0].length ||
                 cellRow + row >= playfield.length ||
-                // 다른 조각과 충돌하는 경우
                 playfield[cellRow + row][cellCol + col])
             ) {
                 return false;
@@ -69,7 +72,6 @@ function placeTetromino() {
     for (let row = 0; row < tetromino.matrix.length; row++) {
         for (let col = 0; col < tetromino.matrix[row].length; col++) {
             if (tetromino.matrix[row][col]) {
-                // 조각이 화면 밖으로 나가면 게임 오버
                 if (tetromino.row + row < 0) {
                     return showGameOver();
                 }
@@ -78,38 +80,21 @@ function placeTetromino() {
         }
     }
 
-    // 바닥부터 시작하여 라인 삭제 확인
-    let linesCleared = 0;
-    for (let row = playfield.length - 1; row >= 0; ) {
+    linesToClear = [];
+    for (let row = playfield.length - 1; row >= 0; row--) {
         if (playfield[row].every(cell => !!cell)) {
-            // 해당 라인 위쪽의 모든 라인을 아래로 내림
-            for (let r = row; r >= 0; r--) {
-                for (let c = 0; c < playfield[r].length; c++) {
-                    playfield[r][c] = playfield[r-1][c];
-                }
-            }
-            linesCleared++;
-        } else {
-            row--;
+            linesToClear.push(row);
         }
     }
-
-    // 삭제된 라인 수에 따라 점수 추가
-    if (linesCleared > 0) {
-        let points = 0;
-        switch(linesCleared) {
-            case 1: points = 100; break;
-            case 2: points = 300; break;
-            case 3: points = 500; break;
-            case 4: points = 800; break;
-        }
-        score += points;
-        updateScore();
+    
+    if (linesToClear.length > 0) {
+        isAnimating = true;
+        flashTimer = Date.now();
+    } else {
+        tetromino = getNextTetromino();
+        isLocked = false;
+        drawNextTetrominoes();
     }
-
-    tetromino = getNextTetromino();
-    isLocked = false;
-    drawNextTetrominoes();
 }
 
 // 점수 표시 업데이트
@@ -122,13 +107,11 @@ function showGameOver() {
     cancelAnimationFrame(rAF);
     gameOver = true;
 
-    // 최고 점수 확인 및 업데이트
     const currentHighest = localStorage.getItem('highestScore') || 0;
     if (score > currentHighest) {
         localStorage.setItem('highestScore', score);
     }
 
-    // 게임 오버 화면에 점수 표시
     document.getElementById('final-score').innerText = score;
     document.getElementById('highest-score').innerText = localStorage.getItem('highestScore') || 0;
     document.getElementById('game-over-screen').style.display = 'block';
@@ -141,9 +124,13 @@ const grid = 32;
 const tetrominoSequence = [];
 let score = 0;
 
-// 게임 판의 각 셀 상태를 추적하기 위한 2D 배열
+let isAnimating = false;
+let linesToClear = [];
+let flashTimer = 0;
+const flashDuration = 100;
+const totalFlashes = 3;
+
 const playfield = [];
-// 빈 게임 판 초기화
 for (let row = -2; row < 20; row++) {
     playfield[row] = [];
     for (let col = 0; col < 10; col++) {
@@ -151,7 +138,6 @@ for (let row = -2; row < 20; row++) {
     }
 }
 
-// 각 도형의 모양 정의
 const tetrominos = {
     'I': [
         [0, 0, 0, 0],
@@ -187,10 +173,15 @@ const tetrominos = {
         [0, 1, 0],
         [1, 1, 1],
         [0, 0, 0],
+    ],
+    'W': [
+        [0, 0, 1, 0],
+        [1, 1, 1, 1],
+        [0, 0, 0, 0],
+        [0, 0, 0, 0]
     ]
 };
 
-// 각 도형의 색상 정의
 const colors = {
     'I': 'cyan',
     'O': 'yellow',
@@ -198,10 +189,10 @@ const colors = {
     'S': 'green',
     'Z': 'red',
     'J': 'blue',
-    'L': 'orange'
+    'L': 'orange',
+    'W': 'pink'
 };
 
-// 미리보기 캔버스 설정
 const nextCanvases = [
     document.getElementById('next-1'),
     document.getElementById('next-2'),
@@ -210,7 +201,6 @@ const nextCanvases = [
 const nextCanvasContexts = nextCanvases.map(canvas => canvas.getContext('2d'));
 const nextGrid = 32;
 
-// 미리보기 블록을 캔버스 중앙에 그리는 함수
 function drawMatrix(context, matrix, pieceName, scale) {
     context.clearRect(0, 0, context.canvas.width, context.canvas.height);
     context.fillStyle = colors[pieceName];
@@ -220,7 +210,6 @@ function drawMatrix(context, matrix, pieceName, scale) {
     let minCol = matrix[0].length;
     let maxCol = 0;
 
-    // 블록의 실제 크기(가장 작은 직사각형) 계산
     for (let row = 0; row < matrix.length; row++) {
         for (let col = 0; col < matrix[row].length; col++) {
             if (matrix[row][col]) {
@@ -235,7 +224,6 @@ function drawMatrix(context, matrix, pieceName, scale) {
     const blockWidth = (maxCol - minCol + 1) * scale;
     const blockHeight = (maxRow - minRow + 1) * scale;
 
-    // 캔버스 중앙에 블록을 배치하기 위한 오프셋
     const offsetX = (context.canvas.width - blockWidth) / 2;
     const offsetY = (context.canvas.height - blockHeight) / 2;
 
@@ -277,6 +265,61 @@ function loop() {
         return;
     }
 
+    if (isAnimating) {
+        const elapsed = Date.now() - flashTimer;
+        const numFlashes = Math.floor(elapsed / (flashDuration * 2));
+        const isFlashingOn = (Math.floor(elapsed / flashDuration) % 2) === 0;
+        
+        if (numFlashes >= totalFlashes) {
+            let clearedCount = linesToClear.length;
+            
+            const newPlayfield = playfield.filter((_, row) => !linesToClear.includes(row));
+            
+            for (let i = 0; i < clearedCount; i++) {
+                newPlayfield.unshift(new Array(10).fill(0));
+            }
+
+            playfield.length = 0;
+            playfield.push(...newPlayfield);
+            
+            let points = 0;
+            switch(clearedCount) {
+                case 1: points = 100; break;
+                case 2: points = 300; break;
+                case 3: points = 500; break;
+                case 4: points = 800; break;
+            }
+            score += points;
+            updateScore();
+            
+            isAnimating = false;
+            linesToClear = [];
+            tetromino = getNextTetromino();
+            isLocked = false;
+            drawNextTetrominoes();
+        }
+
+        context.clearRect(0, 0, canvas.width, canvas.height);
+        for (let row = 0; row < 20; row++) {
+            for (let col = 0; col < 10; col++) {
+                if (playfield[row][col]) {
+                    if (linesToClear.includes(row)) {
+                        if (isFlashingOn) {
+                            context.fillStyle = 'white';
+                            context.fillRect(col * grid, row * grid, grid - 1, grid - 1);
+                        }
+                    } else {
+                        const name = playfield[row][col];
+                        context.fillStyle = colors[name];
+                        context.fillRect(col * grid, row * grid, grid - 1, grid - 1);
+                    }
+                }
+            }
+        }
+        rAF = requestAnimationFrame(loop);
+        return;
+    }
+    
     rAF = requestAnimationFrame(loop);
     context.clearRect(0, 0, canvas.width, canvas.height);
 
@@ -322,7 +365,7 @@ function loop() {
 }
 
 document.addEventListener('keydown', function (e) {
-    if (gameOver) return;
+    if (gameOver || isAnimating) return;
 
     if (e.which === 37 || e.which === 39) {
         const col = e.which === 37 ? tetromino.col - 1 : tetromino.col + 1;
@@ -332,7 +375,7 @@ document.addEventListener('keydown', function (e) {
         }
     }
 
-    if (e.which === 38) {
+    if (e.which === 38 || e.which === 90) {
         const matrix = rotate(tetromino.matrix);
         if (isValidMove(matrix, tetromino.row, tetromino.col)) {
             tetromino.matrix = matrix;
@@ -340,6 +383,14 @@ document.addEventListener('keydown', function (e) {
         }
     }
 
+    if (e.which === 88) {
+        const matrix = rotateCounterClockwise(tetromino.matrix);
+        if (isValidMove(matrix, tetromino.row, tetromino.col)) {
+            tetromino.matrix = matrix;
+            isLocked = false;
+        }
+    }
+    
     if (e.which === 40) {
         const row = tetromino.row + 1;
         if (!isValidMove(tetromino.matrix, row, tetromino.col)) {
@@ -350,6 +401,13 @@ document.addEventListener('keydown', function (e) {
             return;
         }
         tetromino.row = row;
+    }
+
+    if (e.which === 32) {
+        while (isValidMove(tetromino.matrix, tetromino.row + 1, tetromino.col)) {
+            tetromino.row++;
+        }
+        placeTetromino();
     }
 });
 

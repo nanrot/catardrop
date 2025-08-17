@@ -8,7 +8,7 @@ body {
 
 canvas {
     border: solid .2em #fff;
-    height: 90vh;
+    height: 80vh;
 }
 
 .game-info {
