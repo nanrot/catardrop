@@ -109,6 +109,7 @@ function showGameOver() {
     
     cancelAnimationFrame(rAF);
     gameOver = true;
+    isPaused = true; // 게임 오버 시에도 일시 정지 상태로 설정
 
     const currentHighest = localStorage.getItem('highestScore') || 0;
     if (score > currentHighest) {
@@ -134,30 +135,54 @@ const flashDuration = 100;
 const totalFlashes = 3;
 
 const bgm = document.getElementById('bgm');
+bgm.volume = 0.01; // 초기 볼륨 설정
+bgm.loop = true; // BGM 반복 재생
 
 const settingsButton = document.getElementById('settings-button');
 const settingsOverlay = document.getElementById('settings-overlay');
 const settingsCloseButton = document.getElementById('settings-close-button');
 const volumeSlider = document.getElementById('volume-slider');
 const bgmSelect = document.getElementById('bgm-select');
+const volumeNumber = document.getElementById('volume-number');
+
+let isPaused = false;
+
+function updateVolume(value) {
+    let volume = parseFloat(value);
+    if (isNaN(volume) || volume < 0) volume = 0;
+    if (volume > 1) volume = 1;
+
+    bgm.volume = volume;
+    volumeSlider.value = volume;
+    volumeNumber.value = volume.toFixed(2);
+}
+
+volumeSlider.addEventListener('input', (e) => {
+    updateVolume(e.target.value);
+});
+
+volumeNumber.addEventListener('input', (e) => {
+    updateVolume(e.target.value);
+});
 
 settingsButton.addEventListener('click', () => {
+    isPaused = true;
     settingsOverlay.style.display = 'flex';
+    updateVolume(bgm.volume);
+    bgm.pause();
 });
 
 settingsCloseButton.addEventListener('click', () => {
+    isPaused = false;
     settingsOverlay.style.display = 'none';
-});
-
-volumeSlider.addEventListener('input', (e) => {
-    bgm.volume = e.target.value;
+    bgm.play();
+    rAF = requestAnimationFrame(loop);
 });
 
 bgmSelect.addEventListener('change', (e) => {
     bgm.src = `BGM/${e.target.value}`;
     bgm.play().catch(err => console.error("BGM change failed:", err));
 });
-
 
 const playfield = [];
 for (let row = -2; row < 20; row++) {
@@ -290,7 +315,7 @@ const lockDelay = 500;
 let isLocked = false;
 
 function loop() {
-    if (gameOver) {
+    if (gameOver || isPaused) {
         return;
     }
 
@@ -393,8 +418,9 @@ function loop() {
     }
 }
 
+// 키 입력 이벤트 리스너 수정
 document.addEventListener('keydown', function (e) {
-    if (gameOver || isAnimating) return;
+    if (gameOver || isAnimating || isPaused) return;
 
     if (e.which === 37 || e.which === 39) {
         const col = e.which === 37 ? tetromino.col - 1 : tetromino.col + 1;

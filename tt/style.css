@@ -199,3 +199,19 @@ canvas {
 .settings-panel button:hover {
     background-color: #45a049;
 }
+
+.volume-controls {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+#volume-number {
+    width: 60px;
+    padding: 5px;
+    font-size: 0.8em;
+    border-radius: 5px;
+    border: 1px solid #555;
+    background: #444;
+    color: white;
+}

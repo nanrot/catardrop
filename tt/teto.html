@@ -7,50 +7,53 @@
 </head>
 <body>
     <div class="game-info">
-        Score: <span id="score">0</span>
+        점수: <span id="score">0</span>
     </div>
     <div class="game-container">
         <canvas width="320" height="640" id="game"></canvas>
         <div class="next-piece-container">
-            <h3 class="next-title">Next</h3>
-            <canvas width="128" height="128" id="next-1"></canvas>
-            <canvas width="128" height="128" id="next-2"></canvas>
-            <canvas width="128" height="128" id="next-3"></canvas>
+           <h3 class="next-title">다음 블럭</h3>
+           <canvas width="128" height="128" id="next-1"></canvas>
+           <canvas width="128" height="128" id="next-2"></canvas>
+           <canvas width="128" height="128" id="next-3"></canvas>
         </div>
     </div>
 
     <div id="game-over-screen" style="display: none;">
-        <h2>GAME OVER!</h2>
-        <p>Your Score: <span id="final-score">0</span></p>
-        <p>Highest Score: <span id="highest-score">0</span></p>
+        <h2>ㅈ밥 컷!</h2>
+        <p>점수: <span id="final-score">0</span></p>
+        <p>최고 점수: <span id="highest-score">0</span></p>
         <div class="button-container">
-            <button class="game-over-button" onclick="window.location.reload()">Restart</button>
-            <button class="game-over-button" onclick="window.location.href='../index.html'">Home</button>
+           <button class="game-over-button" onclick="window.location.reload()">Restart</button>
+           <button class="game-over-button" onclick="window.location.href='../index.html'">Home</button>
         </div>
     </div>
 
-        <div id="settings-button">⚙️</div>
+    <div id="settings-button">⚙️</div>
 
-     <div id="settings-overlay" style="display: none;">
-         <div class="settings-panel">
-            <h3>Settings</h3>
-            <div class="setting-item">
-              <label for="bgm-select">BGM:</label>
-              <select id="bgm-select">
-                   <option value="BGM1.mp3">BGM 1</option>
-                   <option value="BGM2.mp3">BGM 2</option>
-                   <option value="BGM3.mp3">BGM 3</option>
-              </select>
-            </div>
-            <div class="setting-item">
-                <label for="volume-slider">Volume:</label>
-                <input type="range" id="volume-slider" min="0" max="1" step="0.05" value="0.5">
-            </div>
-            <button id="settings-close-button">Close</button>
+    <div id="settings-overlay" style="display: none;">
+        <div class="settings-panel">
+           <h3>설정</h3>
+           <div class="setting-item">
+             <label for="bgm-select">배경음악:</label>
+             <select id="bgm-select">
+                  <option value="BGM/BGM.mp3">테토리스 한국어</option>
+                  <option value="BGM2.mp3">BGM 2</option>
+                  <option value="BGM3.mp3">BGM 3</option>
+             </select>
+           </div>
+           <div class="setting-item">
+             <label for="volume-slider">배경 음량:</label>
+                           <div class="volume-controls">
+                    <input type="range" id="volume-slider" min="0" max="1" step="0.05" value="0.01">
+                    <input type="number" id="volume-number" min="0" max="1" step="0.05" value="0.01">
+             </div>
+           </div>
+           <button id="settings-close-button">닫기</button>
         </div>
     </div>
 
-    <audio id="bgm" src="BGM/BGM1.mp3" loop></audio>
+    <audio id="bgm" src="BGM/BGM.mp3" loop></audio>
     <script src="tetris.js"></script>
 </body>
 </html>
