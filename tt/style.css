@@ -1,0 +1,56 @@
+/* style.css */
+
+/* Basic page styles */
+html, body {
+    height: 100%;
+    margin: 0;
+    font-family: monospace;
+    color: white;
+    background: black;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Game canvas and info display */
+canvas {
+    border: 1px solid white;
+}
+
+.game-info {
+    margin-bottom: 10px;
+    font-size: 20px;
+}
+
+/* Game over screen styles */
+#game-over-screen {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: rgba(0, 0, 0, 0.75);
+    padding: 20px;
+    border-radius: 10px;
+    text-align: center;
+    color: white;
+    z-index: 10;
+}
+
+.button-container {
+    margin-top: 20px;
+}
+
+.game-over-button {
+    background-color: #4CAF50; /* Green */
+    border: none;
+    color: white;
+    padding: 10px 20px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    margin: 4px 2px;
+    cursor: pointer;
+    border-radius: 5px;
+}
