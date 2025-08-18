@@ -36,12 +36,12 @@
 
     <!-- 게임 오버 화면 -->
     <div id="game-over-screen" class="overlay" style="display:none;">
-      <h2>Game Over</h2>
-      <p>최종 점수: <span id="final-score">0</span></p>
-      <p>최고 점수: <span id="highest-score">0</span></p>
+      <h2>ㅈ밥 컷!</h2>
+      <p>최종 점수 : <span id="final-score">0</span></p>
+      <p>최고 점수 : <span id="highest-score">0</span></p>
       <div class="button-container">
         <button class="game-over-button" onclick="window.location.reload()">Restart</button>
-        <button class="game-over-button" onclick="window.location.href='./index.html'">Home</button>
+        <button class="game-over-button" onclick="window.location.href='../index.html'">Home</button>
       </div>
     </div>
 
@@ -77,7 +77,6 @@
     </div>
   </div>
 
-  <!-- 배경음악 (JS에서 제어) -->
   <audio id="bgm" src="BGM/BGM.mp3" preload="auto"></audio>
 
   <script src="tetris.js"></script>

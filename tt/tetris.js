@@ -219,43 +219,6 @@ function getGhostPosition(matrix, row, col) {
   return row;
 }
 
-if (tetromino) {
-  // 고스트 피스 위치 계산
-  const ghostRow = getGhostPosition(tetromino.matrix, tetromino.row, tetromino.col);
-
-  // 고스트 피스 그리기 (투명도 낮게)
-  context.fillStyle = colors[tetromino.name];
-  context.globalAlpha = 0.3; // 반투명
-  for (let row = 0; row < tetromino.matrix.length; row++) {
-    for (let col = 0; col < tetromino.matrix[row].length; col++) {
-      if (tetromino.matrix[row][col]) {
-        context.fillRect(
-          (tetromino.col + col) * grid,
-          (ghostRow + row) * grid,
-          grid - 1,
-          grid - 1
-        );
-      }
-    }
-  }
-  context.globalAlpha = 1.0; // 원래대로 복원
-
-  // 실제 테트로미노 그리기
-  context.fillStyle = colors[tetromino.name];
-  for (let row = 0; row < tetromino.matrix.length; row++) {
-    for (let col = 0; col < tetromino.matrix[row].length; col++) {
-      if (tetromino.matrix[row][col]) {
-        context.fillRect(
-          (tetromino.col + col) * grid,
-          (tetromino.row + row) * grid,
-          grid - 1,
-          grid - 1
-        );
-      }
-    }
-  }
-}
-
 // 파티클
 const particles = [];
 function spawnParticlesForClearedLines(rows) {
@@ -421,13 +384,25 @@ function loop() {
       if (!isValidMove(tetromino.matrix, tetromino.row, tetromino.col)) {
         tetromino.row--;
         if (!isLocked) { lastDropTime = Date.now(); isLocked = true; }
-      } else {
-        isLocked = false;
-      }
+      } else { isLocked = false; }
     }
 
     if (isLocked && Date.now() - lastDropTime > lockDelay) placeTetromino();
 
+    // 🔹 고스트 피스 그리기
+    const ghostRow = getGhostPosition(tetromino.matrix, tetromino.row, tetromino.col);
+    context.fillStyle = colors[tetromino.name];
+    context.globalAlpha = 0.3;
+    for (let r = 0; r < tetromino.matrix.length; r++) {
+      for (let c = 0; c < tetromino.matrix[r].length; c++) {
+        if (tetromino.matrix[r][c]) {
+          context.fillRect((tetromino.col + c) * grid, (ghostRow + r) * grid, grid - 1, grid - 1);
+        }
+      }
+    }
+    context.globalAlpha = 1.0;
+
+    // 🔹 실제 블럭
     context.fillStyle = colors[tetromino.name];
     for (let r = 0; r < tetromino.matrix.length; r++) {
       for (let c = 0; c < tetromino.matrix[r].length; c++) {

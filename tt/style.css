@@ -61,8 +61,8 @@ canvas { border: solid .2em #fff; height: 80vh; }
   display: flex; flex-direction: column; justify-content: center; align-items: center;
   z-index: 1500;
 }
-#game-over-screen h2 { font-size: 3em; margin: 0 0 10px; }
-#game-over-screen p { font-size: 1.2rem; margin: 6px 0; }
+#game-over-screen h2 { font-size: 3em; margin: 0 0 10px; font-weight: bold;}
+#game-over-screen p { font-size: 1.2em; margin: 6px 0; font-weight: bold;}
 .button-container { margin-top: 16px; }
 .game-over-button {
   background-color: #4CAF50; border: none; color: white;
@@ -70,7 +70,7 @@ canvas { border: solid .2em #fff; height: 80vh; }
 }
 
 #final-score, #highest-score {
-  font-size: 1.8em;
+  font-size: 1.2em;
   font-weight: bold;
   color: #ffcc00;
 }
@@ -120,7 +120,9 @@ canvas { border: solid .2em #fff; height: 80vh; }
   border-radius: 6px;
 }
 
-#volume-slider { width: 100%; }
+#volume-slider {
+  width: 100%;
+}
 #volume-number {
   width: 80px;
   font-size: 0.8em;
