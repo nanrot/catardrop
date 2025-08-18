@@ -124,8 +124,6 @@ function showGameOver() {
 const canvas = document.getElementById('game');
 const context = canvas.getContext('2d');
 const scoreElement = document.getElementById('score');
-const startScreen = document.getElementById('start-screen');
-const startButton = document.getElementById('start-button');
 const grid = 32;
 const tetrominoSequence = [];
 let score = 0;
@@ -140,15 +138,13 @@ const bgm = document.getElementById('bgm');
 bgm.volume = 0.01;
 bgm.loop = true;
 
-// bgm 로드가 완료되면 자동으로 다음 곡을 재생하는 로직 추가
 bgm.addEventListener('ended', () => {
     const options = Array.from(bgmSelect.options);
     const currentIndex = options.findIndex(opt => opt.value === bgmSelect.value);
-    
     const nextIndex = (currentIndex + 1) % options.length;
-    
+
     bgmSelect.value = options[nextIndex].value;
-    bgm.src = `BGM/${bgmSelect.value}`;
+    bgm.src = bgmSelect.value;
     bgm.play().catch(e => console.error("Auto play next BGM failed:", e));
 });
 
@@ -158,6 +154,12 @@ const settingsCloseButton = document.getElementById('settings-close-button');
 const volumeSlider = document.getElementById('volume-slider');
 const bgmSelect = document.getElementById('bgm-select');
 const volumeNumber = document.getElementById('volume-number');
+
+const restartButton = document.querySelector('.game-over-button');
+restartButton.addEventListener('click', () => {
+    document.getElementById('game-over-screen').style.display = 'none';
+    init();
+});
 
 let isPaused = false;
 let isGameStarted = false;
@@ -200,7 +202,7 @@ settingsCloseButton.addEventListener('click', () => {
 });
 
 bgmSelect.addEventListener('change', (e) => {
-    bgm.src = `BGM/${e.target.value}`;
+    bgm.src = e.target.value;
     bgm.play().catch(err => console.error("BGM change failed:", err));
     
     bgm.load();
@@ -227,37 +229,6 @@ function init() {
     });
     rAF = requestAnimationFrame(loop);
 }
-
-restartButton.addEventListener('click', () => {
-    document.getElementById('game-over-screen').style.display = 'none';
-    init();
-});
-
-function init() {
-    score = 0;
-    isGameStarted = true;
-    gameOver = false;
-    isPaused = false;
-    tetrominoSequence.length = 0;
-    playfield.forEach(row => row.fill(0));
-    
-    tetromino = getNextTetromino();
-    
-    startScreen.style.display = 'none';
-    
-    updateScore();
-    drawNextTetrominoes();
-
-    bgm.play().catch(e => {
-        console.error("Autoplay failed:", e);
-    });
-    rAF = requestAnimationFrame(loop);
-}
-
-startButton.addEventListener('click', () => {
-    init();
-});
-
 
 const playfield = [];
 for (let row = -2; row < 20; row++) {
@@ -540,5 +511,4 @@ document.addEventListener('keydown', function (e) {
     }
 });
 
-// 시작 시 게임 초기화
 init();
