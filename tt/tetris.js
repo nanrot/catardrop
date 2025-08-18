@@ -5,6 +5,40 @@ function getRandomInt(min, max) {
     return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
+// 난이도 버튼으로 시작
+function startGame(difficulty) {
+    if (difficulties[difficulty]) {
+        currentDifficulty = difficulty;
+        dropSpeed = difficulties[currentDifficulty];
+    }
+    document.getElementById('title-screen').style.display = 'none';
+    document.getElementById('game-ui').style.display = 'block';
+    init();
+}
+
+// 난이도 설정
+const difficulties = {
+    Easy: 40,
+    Normal: 30,
+    Hard: 20,
+    Lunatic: 10
+};
+let currentDifficulty = "Normal"; // 기본값
+let dropSpeed = difficulties[currentDifficulty];
+
+// 난이도 선택 (게임 시작 시)
+function chooseDifficulty() {
+    const choice = prompt("난이도를 선택하세요: Easy / Normal / Hard / Lunatic", "Normal");
+    if (choice && difficulties[choice]) {
+        currentDifficulty = choice;
+        dropSpeed = difficulties[currentDifficulty];
+    }
+}
+
+// 효과음 로딩 (줄 삭제)
+const clearSound = new Audio("SE/clear.wav");
+clearSound.volume = 0.4; // 필요시 조절
+
 // 새로운 도형 시퀀스 생성
 function generateSequence() {
     const sequence = ['I', 'J', 'L', 'O', 'S', 'T', 'Z', 'W'];
@@ -22,7 +56,7 @@ function getNextTetromino() {
     }
     const name = tetrominoSequence.pop();
     const matrix = tetrominos[name];
-    
+
     const col = playfield[0].length / 2 - Math.ceil(matrix[0].length / 2);
     const row = name === 'I' ? -1 : -2;
 
@@ -67,6 +101,63 @@ function isValidMove(matrix, cellRow, cellCol) {
     return true;
 }
 
+const particles = [];
+
+function spawnParticlesForClearedLines(rows) {
+    rows.forEach(rowIdx => {
+        for (let col = 0; col < 10; col++) {
+            const name = playfield[rowIdx][col];
+            if (!name) continue;
+            const baseX = col * grid + grid / 2;
+            const baseY = rowIdx * grid + grid / 2;
+            const color = colors[name] || 'white';
+
+            const count = getRandomInt(5, 9);
+            for (let i = 0; i < count; i++) {
+                const angle = Math.random() * Math.PI * 2;
+                const speed = 1.5 + Math.random() * 3.5;
+                particles.push({
+                    x: baseX,
+                    y: baseY,
+                    vx: Math.cos(angle) * speed,
+                    vy: Math.sin(angle) * speed - 1.0,
+                    gravity: 0.08,
+                    life: 35 + Math.floor(Math.random() * 20),
+                    alpha: 1,
+                    size: 2 + Math.random() * 2,
+                    color
+                });
+            }
+        }
+    });
+}
+
+function updateParticles() {
+    for (let i = particles.length - 1; i >= 0; i--) {
+        const p = particles[i];
+        p.life -= 1;
+        if (p.life <= 0) {
+            particles.splice(i, 1);
+            continue;
+        }
+        p.x += p.vx;
+        p.y += p.vy;
+        p.vy += p.gravity;
+        p.alpha = Math.max(0, p.life / 40);
+    }
+}
+
+function drawParticles(ctx) {
+    for (const p of particles) {
+        ctx.globalAlpha = p.alpha;
+        ctx.fillStyle = p.color;
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+        ctx.fill();
+    }
+    ctx.globalAlpha = 1;
+}
+
 // 도형를 게임 판에 고정
 function placeTetromino() {
     for (let row = 0; row < tetromino.matrix.length; row++) {
@@ -86,10 +177,13 @@ function placeTetromino() {
             linesToClear.push(row);
         }
     }
-    
+
+    // 줄이 제거되면 아래 줄을 위로 올림
     if (linesToClear.length > 0) {
         isAnimating = true;
         flashTimer = Date.now();
+        try { clearSound.currentTime = 0; clearSound.play(); } catch (e) {}
+        spawnParticlesForClearedLines(linesToClear);
     } else {
         tetromino = getNextTetromino();
         isLocked = false;
@@ -106,7 +200,7 @@ function updateScore() {
 function showGameOver() {
     bgm.pause();
     bgm.currentTime = 0;
-    
+
     cancelAnimationFrame(rAF);
     gameOver = true;
     isPaused = true;
@@ -155,12 +249,6 @@ const volumeSlider = document.getElementById('volume-slider');
 const bgmSelect = document.getElementById('bgm-select');
 const volumeNumber = document.getElementById('volume-number');
 
-const restartButton = document.querySelector('.game-over-button');
-restartButton.addEventListener('click', () => {
-    document.getElementById('game-over-screen').style.display = 'none';
-    init();
-});
-
 let isPaused = false;
 let isGameStarted = false;
 
@@ -192,19 +280,15 @@ settingsButton.addEventListener('click', () => {
 settingsCloseButton.addEventListener('click', () => {
     isPaused = false;
     settingsOverlay.style.display = 'none';
-    bgm.play();
-    
+
     if (isGameStarted) {
         bgm.play().catch(err => console.error("BGM play failed after settings close:", err));
     }
-    
     rAF = requestAnimationFrame(loop);
 });
 
 bgmSelect.addEventListener('change', (e) => {
-    bgm.src = e.target.value;
-    bgm.play().catch(err => console.error("BGM change failed:", err));
-    
+    bgm.src = e.target.value; // ✅ 경로 중복 제거
     bgm.load();
     if (isGameStarted && !isPaused) {
         bgm.play().catch(err => console.error("BGM change and play failed:", err));
@@ -212,15 +296,18 @@ bgmSelect.addEventListener('change', (e) => {
 });
 
 function init() {
+    chooseDifficulty();
+
     score = 0;
     isGameStarted = true;
     gameOver = false;
     isPaused = false;
     tetrominoSequence.length = 0;
     playfield.forEach(row => row.fill(0));
-    
+    particles.length = 0;
+
     tetromino = getNextTetromino();
-    
+
     updateScore();
     drawNextTetrominoes();
 
@@ -320,7 +407,7 @@ function drawMatrix(context, matrix, pieceName, scale) {
             }
         }
     }
-    
+
     const blockWidth = (maxCol - minCol + 1) * scale;
     const blockHeight = (maxRow - minRow + 1) * scale;
 
@@ -347,6 +434,8 @@ function drawNextTetrominoes() {
         if (nextPieceName) {
             const nextMatrix = tetrominos[nextPieceName];
             drawMatrix(nextCanvasContexts[i], nextMatrix, nextPieceName, nextGrid);
+        } else {
+            nextCanvasContexts[i].clearRect(0, 0, nextCanvases[i].width, nextCanvases[i].height);
         }
     }
 }
@@ -371,21 +460,20 @@ function loop() {
         const elapsed = Date.now() - flashTimer;
         const numFlashes = Math.floor(elapsed / (flashDuration * 2));
         const isFlashingOn = (Math.floor(elapsed / flashDuration) % 2) === 0;
-        
+
         if (numFlashes >= totalFlashes) {
             let clearedCount = linesToClear.length;
-            
+
             const newPlayfield = playfield.filter((_, row) => !linesToClear.includes(row));
-            
             for (let i = 0; i < clearedCount; i++) {
                 newPlayfield.unshift(new Array(10).fill(0));
             }
 
             playfield.length = 0;
             playfield.push(...newPlayfield);
-            
+
             let points = 0;
-            switch(clearedCount) {
+            switch (clearedCount) {
                 case 1: points = 100; break;
                 case 2: points = 300; break;
                 case 3: points = 500; break;
@@ -393,7 +481,7 @@ function loop() {
             }
             score += points;
             updateScore();
-            
+
             isAnimating = false;
             linesToClear = [];
             tetromino = getNextTetromino();
@@ -401,26 +489,31 @@ function loop() {
             drawNextTetrominoes();
         }
 
+        // 보드 그리기 + 플래시
         context.clearRect(0, 0, canvas.width, canvas.height);
         for (let row = 0; row < 20; row++) {
             for (let col = 0; col < 10; col++) {
-                if (playfield[row][col]) {
+                const name = playfield[row][col];
+                if (name) {
                     if (linesToClear.includes(row)) {
                         if (isFlashingOn) {
                             context.fillStyle = 'white';
                             context.fillRect(col * grid, row * grid, grid - 1, grid - 1);
                         }
                     } else {
-                        const name = playfield[row][col];
                         context.fillStyle = colors[name];
                         context.fillRect(col * grid, row * grid, grid - 1, grid - 1);
                     }
                 }
             }
         }
+        updateParticles();
+        drawParticles(context);
+
         return;
     }
-    
+
+    // 일반 루프
     context.clearRect(0, 0, canvas.width, canvas.height);
 
     for (let row = 0; row < 20; row++) {
@@ -433,8 +526,12 @@ function loop() {
         }
     }
 
+    // 파티클은 일반 루프에서도 자연 소멸되도록 업데이트/그리기
+    updateParticles();
+    drawParticles(context);
+
     if (tetromino) {
-        if (++count > 35) {
+        if (++count > dropSpeed) {
             tetromino.row++;
             count = 0;
 
@@ -490,7 +587,7 @@ document.addEventListener('keydown', function (e) {
             isLocked = false;
         }
     }
-    
+
     if (e.which === 40) {
         const row = tetromino.row + 1;
         if (!isValidMove(tetromino.matrix, row, tetromino.col)) {

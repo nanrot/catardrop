@@ -33,7 +33,6 @@ canvas {
 
 .next-piece-container canvas {
     border: 1px solid white;
-    box-sizing: border-box;
     width: 128px;
     height: 128px;
 }
@@ -41,17 +40,64 @@ canvas {
 .next-title {
     color: white;
     margin: 0;
-    padding: 0;
     text-align: center;
 }
 
-/* 게임 오버 화면 스타일 */
+/* 타이틀 화면 */
+#title-screen {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: radial-gradient(circle, #1a1a2e, #000);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    color: white;
+    z-index: 2000;
+}
+
+.game-title {
+    font-size: 4em;
+    margin-bottom: 10px;
+    text-shadow: 0 0 20px #ff00ff, 0 0 40px #ff66ff;
+    animation: glow 2s infinite alternate;
+}
+
+@keyframes glow {
+    from { text-shadow: 0 0 20px #ff00ff; }
+    to   { text-shadow: 0 0 40px #ff66ff, 0 0 80px #ff00ff; }
+}
+
+.subtitle {
+    font-size: 1.5em;
+    margin-bottom: 30px;
+    color: #ccc;
+}
+
+.difficulty-buttons button {
+    background: transparent;
+    border: 2px solid #fff;
+    color: white;
+    font-size: 1.5em;
+    margin: 10px;
+    padding: 15px 40px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.difficulty-buttons button:hover {
+    background: #ff66ff;
+    border-color: #ffccff;
+    transform: scale(1.1);
+}
+
+/* 게임 오버 화면 */
 #game-over-screen {
     position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
     background-color: rgba(0, 0, 0, 0.8);
     color: white;
     display: flex;
@@ -61,28 +107,16 @@ canvas {
     z-index: 1000;
 }
 
-#game-over-screen h2 {
-    font-size: 3em;
-    margin-bottom: 10px;
-}
+#game-over-screen h2 { font-size: 3em; margin-bottom: 10px; }
+#game-over-screen p { font-size: 1.2em; margin: 5px 0; }
 
-#game-over-screen p {
-    font-size: 1.2em;
-    margin: 5px 0;
-}
-
-.button-container {
-    margin-top: 20px;
-}
+.button-container { margin-top: 20px; }
 
 .game-over-button {
     background-color: #4CAF50;
     border: none;
     color: white;
     padding: 15px 32px;
-    text-align: center;
-    text-decoration: none;
-    display: inline-block;
     font-size: 16px;
     margin: 4px 2px;
     cursor: pointer;
@@ -90,37 +124,29 @@ canvas {
     transition-duration: 0.4s;
 }
 
-.game-over-button:hover {
-    background-color: #45a049;
-}
+.game-over-button:hover { background-color: #45a049; }
 
+/* 설정 버튼 */
 #settings-button {
     position: absolute;
-    top: 20px;
-    right: 20px;
+    top: 20px; right: 20px;
     font-size: 30px;
     cursor: pointer;
     color: #fff;
-    border: none;
     background: transparent;
-    z-index: 900;
-    transition: transform 0.2s ease-in-out;
+    border: none;
+    transition: transform 0.2s;
 }
 
-#settings-button:hover {
-    transform: rotate(45deg);
-}
+#settings-button:hover { transform: rotate(45deg); }
 
+/* 설정창 */
 #settings-overlay {
     position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
     background-color: rgba(0, 0, 0, 0.7);
-    display: flex;
-    justify-content: center;
-    align-items: center;
+    display: flex; justify-content: center; align-items: center;
     z-index: 1000;
 }
 
@@ -129,89 +155,7 @@ canvas {
     padding: 30px;
     border-radius: 10px;
     border: 2px solid #fff;
-    box-shadow: 0 0 20px rgba(255, 255, 255, 0.1);
     width: 300px;
     text-align: center;
     color: #fff;
-}
-
-.settings-panel h3 {
-    font-size: 1.5em;
-    margin-top: 0;
-    margin-bottom: 20px;
-}
-
-.setting-item {
-    margin-bottom: 20px;
-}
-
-.setting-item label {
-    display: block;
-    margin-bottom: 5px;
-    font-size: 1em;
-}
-
-.settings-panel select, .settings-panel input[type="range"] {
-    width: 100%;
-    padding: 8px;
-    box-sizing: border-box;
-    font-size: 0.8em;
-    border-radius: 5px;
-    border: none;
-}
-
-.settings-panel input[type="range"] {
-    -webkit-appearance: none;
-    height: 8px;
-    background: #555;
-    outline: none;
-    opacity: 0.7;
-    transition: opacity 0.2s;
-}
-
-.settings-panel input[type="range"]:hover {
-    opacity: 1;
-}
-
-.settings-panel input[type="range"]::-webkit-slider-thumb {
-    -webkit-appearance: none;
-    width: 20px;
-    height: 20px;
-    border-radius: 50%;
-    background: #fff;
-    cursor: pointer;
-}
-
-.settings-panel button {
-    background-color: #4CAF50;
-    border: none;
-    color: white;
-    padding: 10px 20px;
-    text-align: center;
-    text-decoration: none;
-    display: inline-block;
-    font-size: 16px;
-    cursor: pointer;
-    border-radius: 8px;
-    transition-duration: 0.4s;
-}
-
-.settings-panel button:hover {
-    background-color: #45a049;
-}
-
-.volume-controls {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-}
-
-#volume-number {
-    width: 60px;
-    padding: 5px;
-    font-size: 0.8em;
-    border-radius: 5px;
-    border: 1px solid #555;
-    background: #444;
-    color: white;
 }
