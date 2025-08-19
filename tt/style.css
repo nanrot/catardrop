@@ -35,21 +35,32 @@ canvas { border: solid .2em #fff; height: 80vh; }
 
 /* 타이틀 화면 배경 */
 #title-screen {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  height: 100vh;
-  background: url('background.jpg') no-repeat center center fixed;
-  background-size: cover;
-  color: white;
-  text-align: center;
+  position: relative;
+}
+
+#title-screen::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: rgba(0,0,0,0.45);
+  z-index: 0;
+}
+
+.game-title, .difficulty-buttons {
+  position: relative;
+  z-index: 1;
 }
 
 .game-title {
   font-size: 3em;
   margin-bottom: 40px;
-  text-shadow: 0 0 12px rgba(255, 100, 150, 0.9);
+  color: #fff;
+  text-shadow:
+    -2px -2px 0 #000,
+     2px -2px 0 #000,
+    -2px  2px 0 #000,
+     2px  2px 0 #000,
+     0 0 12px rgba(255, 100, 150, 0.9);
 }
 
 /* 난이도 선택 */
@@ -63,7 +74,7 @@ canvas { border: solid .2em #fff; height: 80vh; }
 .difficulty-option {
   width: 260px;
   text-align: center;
-  opacity: 0.5; /* 기본 흐릿함 */
+  opacity: 0.5;
   transition: all 0.3s ease;
 }
 
@@ -85,7 +96,7 @@ canvas { border: solid .2em #fff; height: 80vh; }
 .difficulty-option.active button {
   background: rgba(255,255,255,0.15);
   border: 2px solid white;
-  color: #00a0ff; /* 파란색 강조 */
+  color: #00a0ff;
   text-shadow: 0 0 8px rgba(100,200,255,1);
 }
 
