@@ -51,7 +51,7 @@ if (bgm) {
   bgm.volume = 0.01; // 초기 볼륨
   bgm.loop = true;
 }
-const clearSound = new Audio("SE/clear.wav");
+const clearSound = new Audio("BGM/clear.wav");
 clearSound.volume = 0.4;
 
 const tetrominos = {
