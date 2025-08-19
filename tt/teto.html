@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <title>Tetoris</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <!-- 메인 타이틀 화면 -->
+  <div id="title-screen">
+    <h1 class="game-title">Tetoris</h1>
+    <p class="subtitle">난이도를 선택하세요</p>
+    <div class="difficulty-buttons">
+      <div class="difficulty-option" data-difficulty="Easy">
+        <button onclick="startGame('Easy')">Easy</button>
+      </div>
+      <div class="difficulty-option" data-difficulty="Normal">
+        <button onclick="startGame('Normal')">Normal</button>
+      </div>
+      <div class="difficulty-option" data-difficulty="Hard">
+        <button onclick="startGame('Hard')">Hard</button>
+      </div>
+      <div class="difficulty-option" data-difficulty="Lunatic">
+        <button onclick="startGame('Lunatic')">Lunatic</button>
+      </div>
+    </div>
+  </div> <!-- ✅ 빠져있던 닫는 태그 추가 -->
+
+  <!-- 게임 UI -->
+  <div id="game-ui" style="display:none;">
+    <div class="game-info">점수: <span id="score">0</span></div>
+
+    <div class="game-container">
+      <canvas id="game" width="320" height="640" aria-label="게임 화면"></canvas>
+
+      <div class="next-piece-container">
+        <h3 class="next-title">다음 블럭</h3>
+        <canvas id="next-1" width="128" height="128" aria-label="다음 블럭 1"></canvas>
+        <canvas id="next-2" width="128" height="128" aria-label="다음 블럭 2"></canvas>
+        <canvas id="next-3" width="128" height="128" aria-label="다음 블럭 3"></canvas>
+      </div>
+    </div>
+
+    <!-- 게임 오버 화면 -->
+    <div id="game-over-screen" class="overlay" style="display:none;">
+      <h2>ㅈ밥 컷!</h2>
+      <p>최종 점수 : <span id="final-score">0</span></p>
+      <p>최고 점수 : <span id="highest-score">0</span></p>
+      <div class="button-container">
+        <button class="game-over-button" onclick="window.location.reload()">Restart</button>
+        <button class="game-over-button" onclick="window.location.href='../index.html'">Home</button>
+      </div>
+    </div>
+
+    <!-- 설정 버튼 -->
+    <button id="settings-button" title="설정 열기" aria-label="설정 열기">⚙️</button>
+
+    <!-- 설정창 -->
+    <div id="settings-overlay" style="display:none;">
+      <div class="settings-panel" role="dialog" aria-modal="true" aria-labelledby="settings-title">
+        <h3 id="settings-title">설정</h3>
+
+        <div class="setting-item">
+          <label for="bgm-select">배경음악</label>
+          <select id="bgm-select">
+            <option value="BGM/BGM.mp3">테토리스 한국어</option>
+            <option value="BGM/BGM2.mp3">테토리스 일본어</option>
+            <option value="BGM/BGM3.mp3">포테토칩</option>
+          </select>
+        </div>
+
+        <div class="setting-item">
+          <label for="volume-slider">볼륨</label>
+          <div class="volume-row">
+            <input id="volume-slider" type="range" min="0" max="1" step="0.01" value="0.20" />
+            <input id="volume-number" type="number" min="0" max="1" step="0.01" value="0.20" />
+          </div>
+        </div>
+
+        <div class="setting-actions">
+          <button id="settings-close-button" class="game-over-button">닫기</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <audio id="bgm" src="BGM/BGM.mp3" preload="auto"></audio>
+
+  <script src="tetris.js"></script>
+</body>
+</html>

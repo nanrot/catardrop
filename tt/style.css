@@ -1,0 +1,176 @@
+/* 기본 */
+* { box-sizing: border-box; }
+body {
+  background: #202028;
+  color: #fff;
+  font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+  font-size: 2em;
+  text-align: center;
+  margin: 0;
+}
+canvas { border: solid .2em #fff; height: 80vh; }
+
+/* 상단/게임 레이아웃 */
+.game-info {
+  margin: 20px auto;
+  font-size: 1.1em;
+  max-width: 720px;
+  text-align: left;
+}
+.game-container {
+  display: flex;
+  gap: 20px;
+  justify-content: center;
+  align-items: flex-start;
+}
+.next-piece-container {
+  display: flex; flex-direction: column; gap: 10px;
+  margin-top: 32px;
+}
+.next-piece-container canvas {
+  border: 1px solid white;
+  width: 128px; height: 128px;
+}
+.next-title { margin: 0; }
+
+/* 타이틀 화면 배경 */
+#title-screen {
+  position: relative;
+}
+
+#title-screen::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: rgba(0,0,0,0.45);
+  z-index: 0;
+}
+
+.game-title, .difficulty-buttons {
+  position: relative;
+  z-index: 1;
+}
+
+.game-title {
+  font-size: 3em;
+  margin-bottom: 40px;
+  color: #fff;
+  text-shadow:
+    -2px -2px 0 #000,
+     2px -2px 0 #000,
+    -2px  2px 0 #000,
+     2px  2px 0 #000,
+     0 0 12px rgba(255, 100, 150, 0.9);
+}
+
+/* 난이도 선택 */
+.difficulty-buttons {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 25px;
+}
+
+.difficulty-option {
+  width: 260px;
+  text-align: center;
+  opacity: 0.5;
+  transition: all 0.3s ease;
+}
+
+.difficulty-option button {
+  width: 100%;
+  background: transparent;
+  border: none;
+  font-size: 1.8em;
+  cursor: pointer;
+  color: inherit;
+  padding: 12px;
+}
+
+/* 선택된 버튼 강조 */
+.difficulty-option.active {
+  opacity: 1;
+}
+
+.difficulty-option.active button {
+  background: rgba(255,255,255,0.15);
+  border: 2px solid white;
+  color: #00a0ff;
+  text-shadow: 0 0 8px rgba(100,200,255,1);
+}
+
+/* 게임 오버 */
+#game-over-screen {
+  position: fixed; inset: 0;
+  background-color: rgba(0,0,0,.8); color: white;
+  display: flex; flex-direction: column; justify-content: center; align-items: center;
+  z-index: 1500;
+}
+#game-over-screen h2 { font-size: 3em; margin: 0 0 10px; font-weight: bold;}
+#game-over-screen p { font-size: 1.2em; margin: 6px 0; font-weight: bold;}
+.button-container { margin-top: 16px; }
+.game-over-button {
+  background-color: #4CAF50; border: none; color: white;
+  padding: 12px 24px; font-size: 16px; margin: 4px; cursor: pointer; border-radius: 8px; transition: background-color .2s;
+}
+
+#final-score, #highest-score {
+  font-size: 1.2em;
+  font-weight: bold;
+  color: #ffcc00;
+}
+
+.game-over-button:hover { background-color: #45a049; }
+
+/* 설정 버튼 */
+#settings-button {
+  position: absolute; top: 20px; right: 20px;
+  font-size: 30px; cursor: pointer; color: #fff; background: transparent; border: none;
+  transition: transform .2s;
+}
+#settings-button:hover { transform: rotate(45deg); }
+
+/* 설정 패널 */
+#settings-overlay {
+  position: fixed; inset: 0;
+  background-color: rgba(0,0,0,.7);
+  display: none; justify-content: center; align-items: center; z-index: 1600;
+}
+
+.settings-panel {
+  background: #333;
+  color: #fff;
+  border: 2px solid #fff;
+  width: min(95vw, 400px);
+  padding: 36px;
+  border-radius: 12px;
+  text-align: left;
+  font-size: 1em;
+}
+
+.settings-panel h3 {
+  font-size: 1.6em;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.setting-item label {
+  font-size: 0.9em;
+}
+
+#bgm-select {
+  width: 100%;
+  font-size: 0.8em;
+  padding: 6px;
+  border-radius: 6px;
+}
+
+#volume-slider {
+  width: 100%;
+}
+#volume-number {
+  width: 80px;
+  font-size: 0.8em;
+  padding: 4px 6px;
+}
