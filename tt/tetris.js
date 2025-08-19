@@ -46,13 +46,21 @@ const difficulties = { Easy: 40, Normal: 30, Hard: 20, Lunatic: 10 };
 let currentDifficulty = 'Normal';
 let dropSpeed = difficulties[currentDifficulty];
 
+// 난이도 버튼 hover 시 강조 효과
+document.querySelectorAll('.difficulty-option button').forEach(btn => {
+  btn.addEventListener('mouseover', () => {
+    document.querySelectorAll('.difficulty-option').forEach(opt => opt.classList.remove('active'));
+    btn.parentElement.classList.add('active');
+  });
+});
+
 // 사운드
 if (bgm) {
   bgm.volume = 0.01; // 초기 볼륨
   bgm.loop = true;
 }
 const clearSound = new Audio("BGM/clear.mp3");
-clearSound.volume = 0.4;
+clearSound.volume = 0.1;
 
 const tetrominos = {
   'I': [

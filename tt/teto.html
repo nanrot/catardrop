@@ -12,12 +12,20 @@
     <h1 class="game-title">Tetoris</h1>
     <p class="subtitle">난이도를 선택하세요</p>
     <div class="difficulty-buttons">
-      <button onclick="startGame('Easy')">Easy</button>
-      <button onclick="startGame('Normal')">Normal</button>
-      <button onclick="startGame('Hard')">Hard</button>
-      <button onclick="startGame('Lunatic')">Lunatic</button>
+      <div class="difficulty-option" data-difficulty="Easy">
+        <button onclick="startGame('Easy')">Easy</button>
+      </div>
+      <div class="difficulty-option" data-difficulty="Normal">
+        <button onclick="startGame('Normal')">Normal</button>
+      </div>
+      <div class="difficulty-option" data-difficulty="Hard">
+        <button onclick="startGame('Hard')">Hard</button>
+      </div>
+      <div class="difficulty-option" data-difficulty="Lunatic">
+        <button onclick="startGame('Lunatic')">Lunatic</button>
+      </div>
     </div>
-  </div>
+  </div> <!-- ✅ 빠져있던 닫는 태그 추가 -->
 
   <!-- 게임 UI -->
   <div id="game-ui" style="display:none;">
